@@ -50,7 +50,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Migrations\201612071336287_Init.cs" />
     <Compile Include="Migrations\201612071336287_Init.Designer.cs">
       <DependentUpon>201612071336287_Init.cs</DependentUpon>

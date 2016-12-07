@@ -17,6 +17,7 @@ using ConstraintProgramming.Entities;
 namespace ProductRecommender {
     public partial class Window1 {
 
+        SystemContext db = new SystemContext();
         private SolverContext _context;
         private DecisionBinding[] _configurationDecisions;
         private Dictionary<string, DecisionBinding> _decisionsByName;
@@ -35,12 +36,12 @@ namespace ProductRecommender {
         private void CreateModelAndBindToDbData() {
             try {
 
-                SystemContext db = new SystemContext();
+                
 
                 Model productModel = _context.CreateModel();
                 Domain companies = Domain.Enum(db.Companies.Select(x=>x.Name).ToArray());
-                Domain stores = Domain.Enum(db.Companies.Select(x => x.Name).ToArray());
-                Domain categories = Domain.Enum(db.Companies.Select(x => x.Name).ToArray());
+                Domain stores = Domain.Enum(db.Stores.Select(x => x.Name).ToArray());
+                Domain categories = Domain.Enum(db.Categories.Select(x => x.Name).ToArray());
 
                 Decision company = new Decision(companies, "ProductCompany");
                 Decision store = new Decision(stores, "ProductStore");
@@ -49,22 +50,21 @@ namespace ProductRecommender {
                 productModel.AddDecisions(company, store, cateogry, price);
 
                 Domain[] domains = new Domain[] { companies, stores, categories, Domain.IntegerRange(100, 10000) };
-                Tuples table = new Tuples("tuples", domains);
+                Tuples table = new Tuples("ProductsTuples", domains);
 
                 IFormatProvider provider = System.Globalization.CultureInfo.InvariantCulture;
-                //Bind the data from Xml
-                XDocument doc = XDocument.Load(@"..\..\data.xml");
-                IEnumerable<Row> _tableData = from eleRow in db.Products
+                //Bind the data from Db
+                IEnumerable<Row> _tableData = (from eleRow in db.Products
                                               select new Row
                                               {
                                                   Company = eleRow.Company.Name,
                                                   Store = eleRow.Store.Name,
                                                   Category = eleRow.Category.Name,
                                                   Price = eleRow.Price
-                                              };
+                                              }).ToArray();
                 table.SetBinding(_tableData, new[] { "Company", "Store", "Category", "Price" });
                 productModel.AddTuple(table);
-                productModel.AddConstraint("TableConstraint", Model.Equal(new Term[] { company, store, cateogry, price }, table));
+                productModel.AddConstraint("Const", Model.Equal(new Term[] { company, store, cateogry, price }, table));
             }
             catch (Exception ex) {
                 Trace.TraceError(ex.Message);

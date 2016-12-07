@@ -4,7 +4,7 @@
 	x:Class="ProductRecommender.Window1"
 	x:Name="Window"
 	Title="Product Recommender"
-	Width="737" Height="473" Initialized="Window_Initialized" ResizeMode="NoResize" Opacity="0.8" AllowsTransparency="False" Icon="mark-32x32.png" Background="#FFFFFFFF" Foreground="#FF000000">
+	Width="737" Height="473" Initialized="Window_Initialized" ResizeMode="NoResize" AllowsTransparency="False" Icon="mark-32x32.png" Background="#FFFFFFFF" Foreground="#FF000000">
 	<Window.Resources>
 		<Storyboard x:Key="OnLoaded1"/>
 		<Color x:Key="ListBoxBackground">#FFA81515</Color>
