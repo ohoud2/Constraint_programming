@@ -14,7 +14,6 @@ namespace ConstraintProgramming.Entities {
 
             SolverContext _context = SolverContext.GetContext();
             Model _model = _context.CreateModel();
-            _model.Ad
         }
     }
 }
