@@ -1,6 +1,7 @@
 ﻿using Microsoft.SolverFoundation.Services;
 using System;
 using System.Collections.Generic;
+using System.Device.Location;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -61,6 +62,7 @@ namespace ConstraintProgramming.Entities.Solver {
                     }
                     productModel.AddConstraint("companiesSelected", Model.Or(orTerm.ToArray()));
                 }
+
                 if (_filter.selectedCategories.Any()) {
                     // Categories Selection
                     var orTerm = new List<Term>();
@@ -69,26 +71,37 @@ namespace ConstraintProgramming.Entities.Solver {
                     }
                     productModel.AddConstraint("categoriesSelected", Model.Or(orTerm.ToArray()));
                 }
+
                 if (_filter.selectedStores.Any()) {
+                    if (_filter.selectedStores.Contains(0)) { // Nearest Location
+                        var nearestId = getNearestStoreId(_filter.userX, _filter.userY);
+                        _filter.selectedStores = new List<int>(_filter.selectedStores.Union(new int[] { nearestId }));
+                        _filter.selectedStores.Remove(0);
+                    }
                     // Categories Selection
                     var orTerm = new List<Term>();
                     foreach (var s in _filter.selectedStores) {
-                        orTerm.Add(cateogry == s);
+                        orTerm.Add(store == s);
                     }
                     productModel.AddConstraint("storesSelected", Model.Or(orTerm.ToArray()));
                 }
 
-
                 // Price Selection
                 productModel.AddConstraint("maxPrice", price <= _filter.maxPrice);
                 productModel.AddConstraint("minPrice", price >= _filter.minPrice);
-
-
             }
             catch (Exception ex) {
                 Trace.TraceError(ex.Message);
                 _context = null;
             }
+        }
+
+        public int getNearestStoreId(double userX, double userY) {
+            var coord = new GeoCoordinate(userX, userY);
+            var nearest = db.Stores.ToList().Select(x => new { Coordinate = new GeoCoordinate(x.LocationX, x.LocationY) , Id = x.Id})
+                                   .OrderBy(x => x.Coordinate.GetDistanceTo(coord))
+                                   .First().Id;
+            return nearest;
         }
 
 
@@ -149,6 +162,9 @@ namespace ConstraintProgramming.Entities.Solver {
         public ICollection<int> selectedCompanies { get; set; }
         public int minPrice { get; set; }
         public int maxPrice { get; set; }
+
+        public double userX { get; set; }
+        public double userY { get; set; }
     }
 
     public class ProductView {

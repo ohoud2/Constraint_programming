@@ -46,6 +46,20 @@
         <p class="text-center">
             Price: <b>$ 100</b> <input id="ex2" type="text" class="span2" value="" data-slider-min="100" data-slider-max="10000" data-slider-step="50" data-slider-value="[2000,5000]" /> <b>$ 10000</b>
         </p>
+        <div class="row">
+            <div class="col-sm-5">
+                <input id="userX" type="text" class="form-control" /> 
+            </div>
+            <div class="col-sm-5">
+                <input id="userY" type="text" class="form-control"  />
+            </div>
+            <div class="col-sm-2">
+                <button type="button" id="userLocationBtn" class="btn btn-default pull-right">
+                    <span class="glyphicon glyphicon-map-marker"></span>
+                </button>
+            </div>
+        </div>
+        <p></p>
         <button class="btn btn-primary col-xs-12 get-checked-data">Get Products</button>
     </div>
 </div>
@@ -149,6 +163,16 @@
                 init();
             });
 
+            $('#userLocationBtn').on('click', function (event) {
+                event.preventDefault();
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function showPosition(position) {
+                        $('#userX').val(position.coords.latitude);
+                        $('#userY').val(position.coords.longitude);
+                    });
+                }
+            });
+
             $('.get-checked-data').on('click', function (event) {
                 event.preventDefault();
                 var checkedItems = {};
@@ -162,6 +186,8 @@
                 var priceVals = $("#ex2").val().split(",");
                 checkedItems["minPrice"] = parseInt(priceVals[0]);
                 checkedItems["maxPrice"] = parseInt(priceVals[1]);
+                checkedItems["userX"] = parseFloat($('#userX').val());
+                checkedItems["userY"] = parseFloat($('#userY').val());
                 $('#display-json').html(JSON.stringify(checkedItems, null, '\t'));
                 var table = $(".table > tbody");
                 table.html("");
@@ -175,7 +201,6 @@
                         alert(response.responseText);
                     },
                     success: function (data) {
-                        
                         for (var i = 0; i < data.length; i++) {
                             var newTr = dummy;
                             newTr = newTr.replace("{0}", data[i].Name);
