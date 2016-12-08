@@ -1,13 +1,11 @@
 ﻿@using ConstraintProgramming.Entities;
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Product Recommender";
     SystemContext db = new SystemContext();
 }
 
-<h2>Index</h2>
-
-
+<h2 class="text-center">@ViewBag.Title</h2>
 
 <div class="row">
     <div class="col-xs-4">
@@ -43,9 +41,15 @@
     </div>
     
 </div>
-Filter by price interval: <b>$ 100</b> <input id="ex2" type="text" class="span2" value="" data-slider-min="100" data-slider-max="10000" data-slider-step="50" data-slider-value="[200,5000]" /> <b>$ 10000</b>
-<button class="btn btn-primary col-xs-12 get-checked-data">Get Products</button>
-<pre id="display-json"></pre>
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <p class="text-center">
+            Price: <b>$ 100</b> <input id="ex2" type="text" class="span2" value="" data-slider-min="100" data-slider-max="10000" data-slider-step="50" data-slider-value="[2000,5000]" /> <b>$ 10000</b>
+        </p>
+        <button class="btn btn-primary col-xs-12 get-checked-data">Get Products</button>
+    </div>
+</div>
+@*<pre id="display-json"></pre>*@
 <div class="row">
     <div class="col-md-12">
         <table class="table table-responsive table-striped">
@@ -159,7 +163,8 @@ Filter by price interval: <b>$ 100</b> <input id="ex2" type="text" class="span2"
                 checkedItems["minPrice"] = parseInt(priceVals[0]);
                 checkedItems["maxPrice"] = parseInt(priceVals[1]);
                 $('#display-json').html(JSON.stringify(checkedItems, null, '\t'));
-
+                var table = $(".table > tbody");
+                table.html("");
                 $.ajax({
                     url: "@Url.Action("GetProducts")",
                     type: "POST",
@@ -170,8 +175,7 @@ Filter by price interval: <b>$ 100</b> <input id="ex2" type="text" class="span2"
                         alert(response.responseText);
                     },
                     success: function (data) {
-                        var table = $(".table > tbody");
-                        table.html("");
+                        
                         for (var i = 0; i < data.length; i++) {
                             var newTr = dummy;
                             newTr = newTr.replace("{0}", data[i].Name);
