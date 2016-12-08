@@ -1,0 +1,192 @@
+﻿@using ConstraintProgramming.Entities;
+
+@{
+    ViewBag.Title = "Index";
+    SystemContext db = new SystemContext();
+}
+
+<h2>Index</h2>
+
+
+
+<div class="row">
+    <div class="col-xs-4">
+        <h3 class="text-center">Select Company</h3>
+        <div class="well" style="max-height: 300px;overflow: auto;">
+            <ul class="list-group checked-list-box" data-name="selectedCompanies">
+                @foreach (var c in db.Companies) {
+                    <li class="list-group-item" data-id="@c.Id">@c.Name</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="col-xs-4">
+        <h3 class="text-center">Select Store</h3>
+        <div class="well" style="max-height: 300px;overflow: auto;">
+            <ul class="list-group checked-list-box" data-name="selectedStores">
+                <li class="list-group-item list-group-item-info" data-id="0">Nearest Store!</li>
+                @foreach (var s in db.Stores) {
+                    <li class="list-group-item" data-id="@s.Id">@s.Name</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="col-xs-4">
+        <h3 class="text-center">Select Category</h3>
+        <div class="well" style="max-height: 300px;overflow: auto;">
+            <ul class="list-group checked-list-box" data-name="selectedCategories">
+                @foreach (var c in db.Categories) {
+                    <li class="list-group-item" data-id="@c.Id">@c.Name</li>
+                }
+            </ul>
+        </div>
+    </div>
+    
+</div>
+Filter by price interval: <b>$ 100</b> <input id="ex2" type="text" class="span2" value="" data-slider-min="100" data-slider-max="10000" data-slider-step="50" data-slider-value="[200,5000]" /> <b>$ 10000</b>
+<button class="btn btn-primary col-xs-12 get-checked-data">Get Products</button>
+<pre id="display-json"></pre>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-responsive table-striped">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Product Category</th>
+                    <th>Product Price</th>
+                    <th>Product Company</th>
+                    <th>Product Store</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="dummy-tr">
+                    <td>{0}</td>
+                    <td>{1}</td>
+                    <td>{2}</td>
+                    <td>{3}</td>
+                    <td>{4}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/Scripts/bootstrap-slider.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var dummy = $("#dummy-tr").html();
+            $("#dummy-tr").hide();
+            $('.list-group.checked-list-box .list-group-item').each(function () {
+
+                // Settings
+                var $widget = $(this),
+                    $checkbox = $('<input type="checkbox" class="hidden" />'),
+                    color = ($widget.data('color') ? $widget.data('color') : "primary"),
+                    style = ($widget.data('style') == "button" ? "btn-" : "list-group-item-"),
+                    settings = {
+                        on: {
+                            icon: 'glyphicon glyphicon-check'
+                        },
+                        off: {
+                            icon: 'glyphicon glyphicon-unchecked'
+                        }
+                    };
+
+                $widget.css('cursor', 'pointer')
+                $widget.append($checkbox);
+
+                // Event Handlers
+                $widget.on('click', function () {
+                    $checkbox.prop('checked', !$checkbox.is(':checked'));
+                    $checkbox.triggerHandler('change');
+                    updateDisplay();
+                });
+                $checkbox.on('change', function () {
+                    updateDisplay();
+                });
+
+
+                // Actions
+                function updateDisplay() {
+                    var isChecked = $checkbox.is(':checked');
+
+                    // Set the button's state
+                    $widget.data('state', (isChecked) ? "on" : "off");
+
+                    // Set the button's icon
+                    $widget.find('.state-icon')
+                        .removeClass()
+                        .addClass('state-icon ' + settings[$widget.data('state')].icon);
+
+                    // Update the button's color
+                    if (isChecked) {
+                        $widget.addClass(style + color + ' active');
+                    } else {
+                        $widget.removeClass(style + color + ' active');
+                    }
+                }
+
+                // Initialization
+                function init() {
+
+                    if ($widget.data('checked') == true) {
+                        $checkbox.prop('checked', !$checkbox.is(':checked'));
+                    }
+
+                    updateDisplay();
+
+                    // Inject the icon if applicable
+                    if ($widget.find('.state-icon').length == 0) {
+                        $widget.prepend('<span class="state-icon ' + settings[$widget.data('state')].icon + '"></span>');
+                    }
+                }
+                init();
+            });
+
+            $('.get-checked-data').on('click', function (event) {
+                event.preventDefault();
+                var checkedItems = {};
+                $(".checked-list-box").each(function (chkidx, chk) {
+                    var chkName = $(chk).data("name");
+                    checkedItems[chkName] = [];
+                    $(chk).find("li.active").each(function (idx, li) {
+                        checkedItems[chkName].push($(li).data("id"));
+                    });
+                });
+                var priceVals = $("#ex2").val().split(",");
+                checkedItems["minPrice"] = parseInt(priceVals[0]);
+                checkedItems["maxPrice"] = parseInt(priceVals[1]);
+                $('#display-json').html(JSON.stringify(checkedItems, null, '\t'));
+
+                $.ajax({
+                    url: "@Url.Action("GetProducts")",
+                    type: "POST",
+                    data: JSON.stringify(checkedItems),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    error: function (response) {
+                        alert(response.responseText);
+                    },
+                    success: function (data) {
+                        var table = $(".table > tbody");
+                        table.html("");
+                        for (var i = 0; i < data.length; i++) {
+                            var newTr = dummy;
+                            newTr = newTr.replace("{0}", data[i].Name);
+                            newTr = newTr.replace("{1}", data[i].Category);
+                            newTr = newTr.replace("{2}", data[i].Price);
+                            newTr = newTr.replace("{3}", data[i].Company);
+                            newTr = newTr.replace("{4}", data[i].Store);
+                            table.append("<tr>" + newTr + "</tr>")
+                        }
+                    }
+                });
+                
+            });
+            $("#ex2").slider({});
+
+        });
+    </script>
+}

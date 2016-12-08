@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstraintProgramming.Entit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstraintProgramming.Wpf", "ConstraintProgramming.Wpf\ConstraintProgramming.Wpf.csproj", "{46051F84-1454-4B22-A968-86C8486CA860}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstraintProgramming.FrontEnd", "ConstraintProgramming.FrontEnd\ConstraintProgramming.FrontEnd.csproj", "{5842F2EF-C526-44E4-A916-2ABBD40B7119}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{46051F84-1454-4B22-A968-86C8486CA860}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46051F84-1454-4B22-A968-86C8486CA860}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46051F84-1454-4B22-A968-86C8486CA860}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5842F2EF-C526-44E4-A916-2ABBD40B7119}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5842F2EF-C526-44E4-A916-2ABBD40B7119}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5842F2EF-C526-44E4-A916-2ABBD40B7119}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5842F2EF-C526-44E4-A916-2ABBD40B7119}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -61,6 +61,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\Store.cs" />
     <Compile Include="Context\SystemContext.cs" />
+    <Compile Include="Solver\ProductRecommender.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
